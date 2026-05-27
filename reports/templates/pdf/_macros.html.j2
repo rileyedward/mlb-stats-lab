@@ -1,0 +1,20 @@
+{% macro stat_card(label, value, accent="#003831") %}
+<div class="stat-card" style="border-left: 4px solid {{ accent }};">
+  <div class="stat-label">{{ label }}</div>
+  <div class="stat-value">{{ value }}</div>
+</div>
+{% endmacro %}
+
+{% macro chart_block(title, data_uri, caption=None) %}
+<figure class="chart">
+  <h3>{{ title }}</h3>
+  {% if data_uri %}<img src="{{ data_uri }}" alt="{{ title }}">{% else %}<p style="color:#888">(no data)</p>{% endif %}
+  {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}
+</figure>
+{% endmacro %}
+
+{% macro bullet_list(items) %}
+<ul class="takeaways">
+  {% for item in items %}<li>{{ item }}</li>{% endfor %}
+</ul>
+{% endmacro %}

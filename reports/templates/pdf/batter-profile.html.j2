@@ -1,0 +1,95 @@
+{% extends "_base.html.j2" %}
+{% import "_macros.html.j2" as m %}
+
+{% set accent = team | team_color("primary") %}
+
+{% block extra_styles %}
+  .stat-card { border-left-color: {{ accent }}; }
+{% endblock %}
+
+{% block body %}
+
+<section>
+  <h2>Season Line</h2>
+  {{ m.stat_card("PA",   line.PA | int) }}
+  {{ m.stat_card("AVG",  line.AVG | avg) }}
+  {{ m.stat_card("OBP",  line.OBP | avg) }}
+  {{ m.stat_card("SLG",  line.SLG | avg) }}
+  {{ m.stat_card("wOBA", line.wOBA | avg) }}
+  {{ m.stat_card("xwOBA", line.xwOBA | avg) }}
+  {{ m.stat_card("BB%",  line["BB%"] | pct) }}
+  {{ m.stat_card("K%",   line["K%"] | pct) }}
+  {{ m.stat_card("HR",   line.HR | int) }}
+</section>
+
+<section>
+  <h2>Plate Discipline + Contact</h2>
+  {{ m.stat_card("Swing%", discipline["Swing%"] | pct) }}
+  {{ m.stat_card("Chase%", discipline["Chase%"] | pct) }}
+  {{ m.stat_card("Whiff%", discipline["Whiff%"] | pct) }}
+  {{ m.stat_card("CSW%",   discipline["CSW%"] | pct) }}
+  {{ m.stat_card("Avg EV", contact["Avg EV (mph)"] | mph) }}
+  {{ m.stat_card("Barrel%", contact["Barrel%"] | pct) }}
+  {{ m.stat_card("HardHit%", contact["HardHit%"] | pct) }}
+</section>
+
+<section>
+  <h2>Spray</h2>
+  {{ m.chart_block("Batted Balls", figs.spray) }}
+</section>
+
+<section class="page-break">
+  <h2>Zone Profile</h2>
+  <div class="row">
+    {{ m.chart_block("Pitches Seen", figs.zone_density) }}
+    {{ m.chart_block("Swing Rate", figs.zone_swing) }}
+  </div>
+  {{ m.chart_block("xwOBA by Zone", figs.zone_xwoba) }}
+</section>
+
+<section>
+  <h2>Contact Profile</h2>
+  {{ m.chart_block("EV vs LA", figs.ev_la) }}
+</section>
+
+<section class="page-break">
+  <h2>Splits</h2>
+  {{ m.chart_block("vs Handedness", figs.splits_hand) }}
+  {{ m.chart_block("Home / Away",   figs.splits_home_away) }}
+  {{ m.chart_block("By Month",      figs.splits_month) }}
+</section>
+
+{% if by_pitch %}
+<section>
+  <h2>Performance by Pitch Type</h2>
+  <table>
+    <thead><tr>
+      <th>Pitch</th><th>Pitches</th><th>Whiff%</th><th>AVG</th><th>SLG</th><th>xwOBA</th>
+    </tr></thead>
+    <tbody>
+    {% for row in by_pitch %}
+      <tr>
+        <td>{{ row.pitch_type }}</td>
+        <td>{{ row.Pitches | int }}</td>
+        <td>{{ row["Whiff%"] | pct }}</td>
+        <td>{{ row.AVG | avg }}</td>
+        <td>{{ row.SLG | avg }}</td>
+        <td>{{ row.xwOBA | avg }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section>
+  <h2>Recent Form</h2>
+  {{ m.chart_block("Rolling wOBA", figs.rolling_woba) }}
+</section>
+
+<section>
+  <h2>Takeaways</h2>
+  {{ m.bullet_list(takeaways) }}
+</section>
+
+{% endblock %}

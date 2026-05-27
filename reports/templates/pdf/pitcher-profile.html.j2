@@ -1,0 +1,94 @@
+{% extends "_base.html.j2" %}
+{% import "_macros.html.j2" as m %}
+
+{% set accent = team | team_color("primary") %}
+
+{% block extra_styles %}
+  .stat-card { border-left-color: {{ accent }}; }
+{% endblock %}
+
+{% block body %}
+
+<section>
+  <h2>Season Line</h2>
+  {{ m.stat_card("BF",   line.BF | int) }}
+  {{ m.stat_card("IP",   "%.1f" | format(line.IP)) }}
+  {{ m.stat_card("K",    line.K | int) }}
+  {{ m.stat_card("BB",   line.BB | int) }}
+  {{ m.stat_card("K%",   line["K%"] | pct) }}
+  {{ m.stat_card("BB%",  line["BB%"] | pct) }}
+  {{ m.stat_card("K-BB%",line["K-BB%"] | pct) }}
+  {{ m.stat_card("WHIP", "%.2f" | format(line.WHIP)) }}
+  {{ m.stat_card("xwOBA", line["xwOBA-against"] | avg) }}
+</section>
+
+<section>
+  <h2>Command</h2>
+  {{ m.stat_card("First-Pitch K%", command["First-Pitch Strike%"] | pct) }}
+  {{ m.stat_card("Zone%",  command["Zone%"] | pct) }}
+  {{ m.stat_card("Edge%",  command["Edge%"] | pct) }}
+  {{ m.stat_card("Heart%", command["Heart%"] | pct) }}
+  {{ m.stat_card("Ball%",  command["Ball%"] | pct) }}
+</section>
+
+<section>
+  <h2>Arsenal</h2>
+  <div class="row">
+    {{ m.chart_block("Movement", figs.movement) }}
+    {{ m.chart_block("Velocity",  figs.velocity) }}
+  </div>
+  <div class="row">
+    {{ m.chart_block("Pitch Mix", figs.usage_pie) }}
+    {{ m.chart_block("Usage vs Hand", figs.usage_hand) }}
+  </div>
+</section>
+
+<section class="page-break">
+  <h2>Locations</h2>
+  <div class="row">
+    {{ m.chart_block("Pitch Locations", figs.zone_density) }}
+    {{ m.chart_block("Whiff% by Zone",  figs.zone_whiff) }}
+  </div>
+</section>
+
+{% if results %}
+<section>
+  <h2>Results by Pitch</h2>
+  <table>
+    <thead><tr>
+      <th>Pitch</th><th>Pitches</th><th>Usage%</th><th>Whiff%</th><th>CSW%</th><th>BAA</th><th>xwOBA</th>
+    </tr></thead>
+    <tbody>
+    {% for row in results %}
+      <tr>
+        <td>{{ row.pitch_type }}</td>
+        <td>{{ row.Pitches | int }}</td>
+        <td>{{ row["Usage%"] | pct }}</td>
+        <td>{{ row["Whiff%"] | pct }}</td>
+        <td>{{ row["CSW%"] | pct }}</td>
+        <td>{{ row.BAA | avg }}</td>
+        <td>{{ row["xwOBA-against"] | avg }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="page-break">
+  <h2>Splits</h2>
+  {{ m.chart_block("K-BB% vs Hand", figs.splits_hand) }}
+  {{ m.chart_block("K-BB% by Innings", figs.splits_innings) }}
+</section>
+
+<section>
+  <h2>Recent Form</h2>
+  {{ m.chart_block("Rolling K%", figs.rolling_k) }}
+</section>
+
+<section>
+  <h2>Takeaways</h2>
+  {{ m.bullet_list(takeaways) }}
+</section>
+
+{% endblock %}

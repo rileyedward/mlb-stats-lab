@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{{ report_title }}{% endblock %}</title>
+  <link rel="stylesheet" href="_styles.css">
+  <style>
+    @page {
+      size: Letter;
+      margin: 0.6in 0.6in 0.8in 0.6in;
+      @bottom-left { content: "{{ report_title }}"; font-size: 8pt; color: #888; }
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 8pt; color: #888; }
+    }
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+  <header class="cover">
+    <h1>{{ report_title }}</h1>
+    <p class="subtitle">{{ report_subtitle }}</p>
+    <p class="meta">Generated {{ generated_at }}</p>
+  </header>
+
+  {% block body %}{% endblock %}
+
+  <footer class="endnote">
+    <p>MLB Stats Lab — Data via Statcast / pybaseball</p>
+  </footer>
+</body>
+</html>

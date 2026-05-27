@@ -1,0 +1,113 @@
+"""Pure DataFrame→DataFrame transforms. Compose via ``df.pipe(...)``."""
+
+from __future__ import annotations
+
+from mlb_stats_lab.filters.count import (
+    ahead_in_count,
+    behind_in_count,
+    by_count,
+    even_count,
+    first_pitch,
+    full_count,
+    three_ball_counts,
+    two_strike_counts,
+)
+from mlb_stats_lab.filters.date import (
+    by_date_range,
+    by_month,
+    last_n_days,
+    since_date,
+)
+from mlb_stats_lab.filters.pitch import (
+    breaking_balls,
+    by_pitch_type,
+    by_zone,
+    edge_pitches,
+    fastballs,
+    heart_pitches,
+    in_zone,
+    offspeed,
+    out_of_zone,
+)
+from mlb_stats_lab.filters.player import (
+    by_batter,
+    by_batter_handedness,
+    by_pitcher,
+    by_pitcher_handedness,
+    vs_handedness,
+)
+from mlb_stats_lab.filters.result import (
+    only_called_pitches,
+    only_completed_pa,
+    only_hits,
+    only_in_play,
+    only_strikeouts,
+    only_swings,
+    only_walks,
+)
+from mlb_stats_lab.filters.situation import (
+    bases_empty,
+    by_inning,
+    close_game,
+    early_innings,
+    high_leverage,
+    late_innings,
+    middle_innings,
+    risp,
+    with_runners_on,
+)
+from mlb_stats_lab.filters.team import (
+    away_games_for,
+    by_team,
+    home_games_for,
+    vs_team,
+)
+
+__all__ = [
+    "ahead_in_count",
+    "away_games_for",
+    "bases_empty",
+    "behind_in_count",
+    "breaking_balls",
+    "by_batter",
+    "by_batter_handedness",
+    "by_count",
+    "by_date_range",
+    "by_inning",
+    "by_month",
+    "by_pitch_type",
+    "by_pitcher",
+    "by_pitcher_handedness",
+    "by_team",
+    "by_zone",
+    "close_game",
+    "early_innings",
+    "edge_pitches",
+    "even_count",
+    "fastballs",
+    "first_pitch",
+    "full_count",
+    "heart_pitches",
+    "high_leverage",
+    "home_games_for",
+    "in_zone",
+    "last_n_days",
+    "late_innings",
+    "middle_innings",
+    "offspeed",
+    "only_called_pitches",
+    "only_completed_pa",
+    "only_hits",
+    "only_in_play",
+    "only_strikeouts",
+    "only_swings",
+    "only_walks",
+    "out_of_zone",
+    "risp",
+    "since_date",
+    "three_ball_counts",
+    "two_strike_counts",
+    "vs_handedness",
+    "vs_team",
+    "with_runners_on",
+]

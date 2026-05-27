@@ -1,0 +1,56 @@
+{% extends "_base.html.j2" %}
+{% import "_macros.html.j2" as m %}
+
+{% set accent_a = team_a | team_color("primary") %}
+{% set accent_b = team_b | team_color("primary") %}
+
+{% block body %}
+
+<section>
+  <h2>Offense — {{ team_a }} vs {{ team_b }}</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>{{ team_a }}</th><th>{{ team_b }}</th></tr></thead>
+    <tbody>
+      <tr><td>PA</td><td>{{ team_a_offense.PA | int }}</td><td>{{ team_b_offense.PA | int }}</td></tr>
+      <tr><td>AVG</td><td>{{ team_a_offense.AVG | avg }}</td><td>{{ team_b_offense.AVG | avg }}</td></tr>
+      <tr><td>OBP</td><td>{{ team_a_offense.OBP | avg }}</td><td>{{ team_b_offense.OBP | avg }}</td></tr>
+      <tr><td>SLG</td><td>{{ team_a_offense.SLG | avg }}</td><td>{{ team_b_offense.SLG | avg }}</td></tr>
+      <tr><td>wOBA</td><td>{{ team_a_offense.wOBA | avg }}</td><td>{{ team_b_offense.wOBA | avg }}</td></tr>
+      <tr><td>BB%</td><td>{{ team_a_offense["BB%"] | pct }}</td><td>{{ team_b_offense["BB%"] | pct }}</td></tr>
+      <tr><td>K%</td><td>{{ team_a_offense["K%"] | pct }}</td><td>{{ team_b_offense["K%"] | pct }}</td></tr>
+    </tbody>
+  </table>
+  <div class="row">
+    {{ m.chart_block(team_a + " vs Hand", figs.a_offense_hand) }}
+    {{ m.chart_block(team_b + " vs Hand", figs.b_offense_hand) }}
+  </div>
+</section>
+
+<section class="page-break">
+  <h2>Pitching — {{ team_a }} vs {{ team_b }}</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>{{ team_a }}</th><th>{{ team_b }}</th></tr></thead>
+    <tbody>
+      <tr><td>BF</td><td>{{ team_a_pitching.BF | int }}</td><td>{{ team_b_pitching.BF | int }}</td></tr>
+      <tr><td>K%</td><td>{{ team_a_pitching["K%"] | pct }}</td><td>{{ team_b_pitching["K%"] | pct }}</td></tr>
+      <tr><td>BB%</td><td>{{ team_a_pitching["BB%"] | pct }}</td><td>{{ team_b_pitching["BB%"] | pct }}</td></tr>
+      <tr><td>K-BB%</td><td>{{ team_a_pitching["K-BB%"] | pct }}</td><td>{{ team_b_pitching["K-BB%"] | pct }}</td></tr>
+      <tr><td>xwOBA</td><td>{{ team_a_pitching["xwOBA-against"] | avg }}</td><td>{{ team_b_pitching["xwOBA-against"] | avg }}</td></tr>
+    </tbody>
+  </table>
+  <div class="row">
+    {{ m.chart_block(team_a + " Staff Usage", figs.a_staff_usage) }}
+    {{ m.chart_block(team_b + " Staff Usage", figs.b_staff_usage) }}
+  </div>
+  <div class="row">
+    {{ m.chart_block(team_a + " Velo", figs.a_velocity) }}
+    {{ m.chart_block(team_b + " Velo", figs.b_velocity) }}
+  </div>
+</section>
+
+<section>
+  <h2>Takeaways</h2>
+  {{ m.bullet_list(takeaways) }}
+</section>
+
+{% endblock %}

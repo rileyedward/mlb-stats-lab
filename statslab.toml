@@ -1,0 +1,12 @@
+[paths]
+notebooks_dir = "notebooks"
+reports_dir = "reports"
+templates_dir = "reports/templates"
+output_dir = "reports/output"
+
+[season]
+# Override auto-detection if needed
+# default_year = 2026
+
+[pybaseball]
+cache_enabled = true

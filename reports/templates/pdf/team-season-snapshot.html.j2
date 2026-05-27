@@ -1,0 +1,56 @@
+{% extends "_base.html.j2" %}
+{% import "_macros.html.j2" as m %}
+
+{% set accent = team | team_color("primary") %}
+
+{% block extra_styles %}
+  .stat-card { border-left-color: {{ accent }}; }
+{% endblock %}
+
+{% block body %}
+
+<section>
+  <h2>Record</h2>
+  {{ m.stat_card("Team",  record.team) }}
+  {{ m.stat_card("Season", record.season | int) }}
+  {% if record.W is defined %}{{ m.stat_card("W-L", record.W | string + "-" + record.L | string) }}{% endif %}
+  {% if record.games is defined %}{{ m.stat_card("Games", record.games | int) }}{% endif %}
+</section>
+
+<section>
+  <h2>Offense</h2>
+  {{ m.stat_card("PA",   offense.line.PA | int) }}
+  {{ m.stat_card("AVG",  offense.line.AVG | avg) }}
+  {{ m.stat_card("OBP",  offense.line.OBP | avg) }}
+  {{ m.stat_card("SLG",  offense.line.SLG | avg) }}
+  {{ m.stat_card("wOBA", offense.line.wOBA | avg) }}
+  {{ m.stat_card("HR",   offense.line.HR | int) }}
+  {{ m.stat_card("Avg EV", offense.contact["Avg EV (mph)"] | mph) }}
+  {{ m.stat_card("Barrel%", offense.contact["Barrel%"] | pct) }}
+  <div class="row">
+    {{ m.chart_block("Offense vs Hand", figs.offense_hand) }}
+    {{ m.chart_block("Offense by Month", figs.offense_month) }}
+  </div>
+  {{ m.chart_block("Team EV / LA", figs.offense_ev_la) }}
+</section>
+
+<section class="page-break">
+  <h2>Pitching</h2>
+  {{ m.stat_card("BF",   pitching.line.BF | int) }}
+  {{ m.stat_card("IP",   "%.1f" | format(pitching.line.IP)) }}
+  {{ m.stat_card("K%",   pitching.line["K%"] | pct) }}
+  {{ m.stat_card("BB%",  pitching.line["BB%"] | pct) }}
+  {{ m.stat_card("K-BB%",pitching.line["K-BB%"] | pct) }}
+  {{ m.stat_card("HR/9", "%.2f" | format(pitching.line["HR/9"])) }}
+  <div class="row">
+    {{ m.chart_block("Staff Usage", figs.staff_usage) }}
+    {{ m.chart_block("Staff Velocity", figs.staff_velocity) }}
+  </div>
+</section>
+
+<section>
+  <h2>Takeaways</h2>
+  {{ m.bullet_list(takeaways) }}
+</section>
+
+{% endblock %}
