@@ -36,10 +36,14 @@ def _to_dict(context: Any) -> dict[str, Any]:
 
 def render_html(template: str, context: Any) -> str:
     """Render a template to HTML only."""
+    from mlb_stats_lab.viz.theme import report_theme
+
     env = _env()
     tpl = env.get_template(f"{template}.html.j2")
     data = _to_dict(context)
     data.setdefault("generated_at", datetime.now().isoformat(timespec="seconds"))
+    subject_team = data.get("team") or data.get("team_a")
+    data.setdefault("theme", report_theme(subject_team if subject_team != "—" else None))
     return tpl.render(**data)
 
 

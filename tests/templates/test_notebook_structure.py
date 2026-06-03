@@ -1,14 +1,14 @@
 """Structural smoke tests for notebook templates.
 
-Verifies each template:
+Verifies each jupytext ``.py`` template:
 - exists,
-- is a valid notebook,
+- converts to a valid notebook,
 - has the required cell tags (`parameters`, `setup`, `load`, `summary`).
 """
 
 from __future__ import annotations
 
-import nbformat
+import jupytext
 import pytest
 
 from mlb_stats_lab.cli.registry import TEMPLATES
@@ -18,7 +18,8 @@ from mlb_stats_lab.cli.registry import TEMPLATES
 def test_notebook_template_has_expected_tags(name: str) -> None:
     spec = TEMPLATES[name]
     assert spec.notebook_path.exists(), f"{spec.notebook_path} missing"
-    nb = nbformat.read(str(spec.notebook_path), as_version=4)
+    assert spec.notebook_path.suffix == ".py", "templates are jupytext .py source"
+    nb = jupytext.read(str(spec.notebook_path))
     all_tags: set[str] = set()
     for cell in nb.cells:
         for t in cell.get("metadata", {}).get("tags", []) or []:

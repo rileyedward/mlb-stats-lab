@@ -7,10 +7,7 @@ import typer
 from mlb_stats_lab.cli import _output as out
 from mlb_stats_lab.data.cache import flush
 
-app = typer.Typer()
 
-
-@app.callback(invoke_without_command=True)
 def flush_cache(
     older_than_days: int | None = typer.Option(
         None, "--older-than-days", help="Only remove files older than N days. Omit to remove all."

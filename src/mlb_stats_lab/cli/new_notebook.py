@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+import jupytext
 import nbformat
 import typer
 
@@ -38,7 +39,8 @@ def _format_param(value: Any) -> str:
 
 
 def _rewrite_parameters(nb_path: Path, params: dict[str, Any]) -> nbformat.NotebookNode:
-    nb = nbformat.read(str(nb_path), as_version=4)
+    # Templates are percent-format .py (jupytext); convert to a notebook node.
+    nb = jupytext.read(str(nb_path))
     rewrote = False
     for cell in nb.cells:
         tags = cell.get("metadata", {}).get("tags", []) or []
@@ -62,7 +64,35 @@ def _write(nb: nbformat.NotebookNode, out_dir: Path, filename: str) -> Path:
     return path
 
 
-def _emit(template: str, params: dict[str, Any], slug_parts: list[str]) -> Path:
+def _execute(nb: nbformat.NotebookNode, path: Path) -> None:
+    """Run every cell in-place against the project kernel, then persist output."""
+    from nbclient import NotebookClient
+    from nbclient.exceptions import CellExecutionError
+
+    try:
+        from jupyter_client.kernelspec import NoSuchKernel
+    except Exception:  # pragma: no cover - jupyter_client always present via ipykernel
+        NoSuchKernel = Exception  # type: ignore[assignment, misc]
+
+    def _run(kernel_name: str | None) -> None:
+        client = NotebookClient(nb, timeout=600, kernel_name=kernel_name or "")
+        client.execute()
+
+    try:
+        _run(None)  # use the notebook's own kernelspec (mlb-stats-lab)
+    except NoSuchKernel:
+        out.warn("Kernel 'mlb-stats-lab' not registered — falling back to python3.")
+        _run("python3")
+    except CellExecutionError as exc:
+        with path.open("w") as f:
+            nbformat.write(nb, f)  # persist partial output for debugging
+        raise RuntimeError(f"Notebook execution failed: {exc}") from exc
+
+    with path.open("w") as f:
+        nbformat.write(nb, f)
+
+
+def _emit(template: str, params: dict[str, Any], slug_parts: list[str], run: bool = False) -> Path:
     cfg = get_config()
     spec = get_spec(template)
     nb_path = spec.notebook_path
@@ -71,9 +101,24 @@ def _emit(template: str, params: dict[str, Any], slug_parts: list[str]) -> Path:
     nb = _rewrite_parameters(nb_path, params)
     slug = "_".join(filter(None, slug_parts))
     name = f"{template.replace('-', '_')}__{slug}__{_today()}.ipynb"
-    path = _write(nb, cfg.paths.reports_dir, name)
-    out.success(f"Generated {path}")
-    out.info(f"Open with: uv run jupyter lab {path}")
+    path = _write(nb, cfg.paths.generated_dir, name)
+
+    if run:
+        with out.status("Executing notebook (fetches from pybaseball)..."):
+            _execute(nb, path)
+        out.summary(
+            "Notebook ready",
+            {"File": str(path), "Status": "executed", "Open": f"uv run jupyter lab {path}"},
+        )
+    else:
+        out.summary(
+            "Notebook generated",
+            {
+                "File": str(path),
+                "Status": "scaffold (not run)",
+                "Open": f"uv run jupyter lab {path}",
+            },
+        )
     return path
 
 
@@ -84,6 +129,9 @@ def batter_profile(
     start: str | None = typer.Option(None, "--start"),
     end: str | None = typer.Option(None, "--end"),
     recent_form_pas: int = typer.Option(25, "--recent-form-pas"),
+    run: bool = typer.Option(
+        False, "--run/--no-run", help="Execute the notebook after scaffolding."
+    ),
 ) -> None:
     """Scaffold a batter-profile notebook."""
     _emit(
@@ -96,6 +144,7 @@ def batter_profile(
             "recent_form_pas": recent_form_pas,
         },
         [_slug(player)],
+        run,
     )
 
 
@@ -106,6 +155,9 @@ def pitcher_profile(
     start: str | None = typer.Option(None, "--start"),
     end: str | None = typer.Option(None, "--end"),
     recent_form_starts: int = typer.Option(5, "--recent-form-starts"),
+    run: bool = typer.Option(
+        False, "--run/--no-run", help="Execute the notebook after scaffolding."
+    ),
 ) -> None:
     """Scaffold a pitcher-profile notebook."""
     _emit(
@@ -118,6 +170,7 @@ def pitcher_profile(
             "recent_form_starts": recent_form_starts,
         },
         [_slug(player)],
+        run,
     )
 
 
@@ -128,6 +181,9 @@ def team_season_snapshot(
     start: str | None = typer.Option(None, "--start"),
     end: str | None = typer.Option(None, "--end"),
     recent_window_games: int = typer.Option(15, "--recent-window-games"),
+    run: bool = typer.Option(
+        False, "--run/--no-run", help="Execute the notebook after scaffolding."
+    ),
 ) -> None:
     """Scaffold a team-season-snapshot notebook."""
     team_n = normalize_team(team)
@@ -141,6 +197,7 @@ def team_season_snapshot(
             "recent_window_games": recent_window_games,
         },
         [team_n],
+        run,
     )
 
 
@@ -152,6 +209,9 @@ def series_matchup(
     start: str | None = typer.Option(None, "--start"),
     end: str | None = typer.Option(None, "--end"),
     recent_form_games: int = typer.Option(10, "--recent-form-games"),
+    run: bool = typer.Option(
+        False, "--run/--no-run", help="Execute the notebook after scaffolding."
+    ),
 ) -> None:
     """Scaffold a series-matchup notebook."""
     a = normalize_team(team_a)
@@ -167,4 +227,5 @@ def series_matchup(
             "recent_form_games": recent_form_games,
         },
         [a, "vs", b],
+        run,
     )

@@ -5,19 +5,28 @@
   <title>{% block title %}{{ report_title }}{% endblock %}</title>
   <link rel="stylesheet" href="_styles.css">
   <style>
+    :root {
+      --accent: {{ theme.primary }};
+      --accent-2: {{ theme.secondary }};
+      --accent-text: {{ theme.text_on_primary }};
+      --accent-soft: {{ theme.accent_soft }};
+      --accent-mid: {{ theme.accent_mid }};
+    }
     @page {
       size: Letter;
       margin: 0.6in 0.6in 0.8in 0.6in;
-      @bottom-left { content: "{{ report_title }}"; font-size: 8pt; color: #888; }
-      @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 8pt; color: #888; }
+      @bottom-left { content: "{{ report_title }}"; font-size: 8pt; color: #999; }
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 8pt; color: #999; }
     }
     {% block extra_styles %}{% endblock %}
   </style>
 </head>
 <body>
   <header class="cover">
-    <h1>{{ report_title }}</h1>
-    <p class="subtitle">{{ report_subtitle }}</p>
+    <div class="cover-band">
+      <h1>{{ report_title }}</h1>
+      <p class="subtitle">{{ report_subtitle }}</p>
+    </div>
     <p class="meta">Generated {{ generated_at }}</p>
   </header>
 

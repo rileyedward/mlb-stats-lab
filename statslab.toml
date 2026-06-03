@@ -1,5 +1,6 @@
 [paths]
 notebooks_dir = "notebooks"
+generated_dir = "notebooks/generated"
 reports_dir = "reports"
 templates_dir = "reports/templates"
 output_dir = "reports/output"

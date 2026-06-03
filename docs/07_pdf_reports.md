@@ -1,5 +1,16 @@
 # 07 — PDF Reports
 
+> **Update (look & feel overhaul).** Reports now share one color story:
+> `mlb_stats_lab.viz.theme.report_theme(team)` returns design tokens (primary /
+> secondary / text / soft / mid). `reports.engine.render_html` injects them into
+> every template as CSS custom properties (`--accent`, `--accent-2`, …) on `:root`
+> in `_base.html.j2`. `_styles.css` consumes those variables, so the team-colored
+> cover band, grid stat cards, and themed tables all theme from one source.
+> Chart figures are tinted to match via `report_chart_context(accent)` wrapped
+> around figure generation in `reports/context.py` (titles/spines pick up the team
+> color; data-series colors are untouched). See the WeasyPrint native-library note
+> in the README for Apple Silicon setup.
+
 ## Purpose
 
 Defines how a notebook's analytical output gets rendered to a polished PDF report. Stack: **Jinja2 HTML templates → WeasyPrint → PDF** (per `02_tech_stack.md`).

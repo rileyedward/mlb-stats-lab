@@ -25,7 +25,8 @@ class TemplateSpec:
 
     @property
     def notebook_path(self) -> Path:
-        return get_config().paths.notebook_templates_dir / f"{self.name}.ipynb"
+        """Source-of-truth jupytext template (percent-format ``.py``)."""
+        return get_config().paths.notebook_templates_dir / f"{self.name}.py"
 
 
 TEMPLATES: dict[str, TemplateSpec] = {

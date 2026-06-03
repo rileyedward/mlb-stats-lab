@@ -1,5 +1,19 @@
 # 06 — Notebook Templates
 
+> **Update (presentation overhaul).** The design below is the original v1 plan.
+> What changed in the overhaul:
+> - Templates are now **jupytext percent-format `.py`** files in
+>   `reports/templates/notebooks/` (source of truth), paired to `.ipynb` via
+>   `[tool.jupytext]`. The `scripts/generate_notebook_templates.py` generator is gone.
+> - Generated notebooks are written to **`notebooks/generated/`**, not `reports/`.
+> - **Auto-execution shipped**: `statslab new-notebook … --run` executes the notebook
+>   via `nbclient` after parameter substitution (default stays scaffold-only).
+> - Templates render with shared presentation helpers from
+>   `mlb_stats_lab.viz.display` — `report_header()`, `section()`, `stat_table()`,
+>   `metric_row()` — instead of raw `display(series.to_frame("value"))` dumps.
+> Cell tags (`parameters`, `setup`, `load`, `section`, `summary`, `hidden`) are
+> unchanged and preserved through the `.py` ⇄ `.ipynb` round-trip.
+
 ## Purpose
 
 Each template is a scaffold `.ipynb` that — given a few parameters — produces a structured analysis notebook combining helpers from `04` and charts from `05`. Templates are the workflow backbone: most user reporting will start from one of them, not from a blank notebook.

@@ -19,13 +19,15 @@ dependencies = [
     "weasyprint>=61.0",
     "typer>=0.12",
     "nbformat>=5.10",
+    "nbclient>=0.10",
+    "jupytext>=1.16",
+    "questionary>=2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
-    "nbclient>=0.10",
     "ruff>=0.5",
     "mypy>=1.10",
     "import-linter>=2.0",
@@ -98,6 +100,11 @@ addopts = "-ra"
 markers = [
     "network: tests that require live pybaseball / network access",
 ]
+
+# ---- jupytext ----
+[tool.jupytext]
+# Notebook templates live as percent-format .py (source of truth), paired to .ipynb.
+formats = "ipynb,py:percent"
 
 # ---- import-linter ----
 [tool.importlinter]

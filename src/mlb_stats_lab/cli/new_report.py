@@ -32,12 +32,12 @@ def _default_out(template: str, slug_parts: list[str]) -> str:
 
 def _run(template: str, args: dict[str, Any], slug_parts: list[str], out_path: str | None) -> Path:
     spec = get_spec(template)
-    out.step("Building context (may fetch from pybaseball)...")
-    ctx = spec.builder(args)
+    with out.status("Building context (fetches from pybaseball)..."):
+        ctx = spec.builder(args)
     target = out_path or _default_out(template, slug_parts)
-    out.step(f"Rendering {template}...")
-    path = render_report(template, ctx, target)
-    out.success(f"Wrote {path}")
+    with out.status(f"Rendering {template} → PDF..."):
+        path = render_report(template, ctx, target)
+    out.summary("Report rendered", {"Template": template, "File": str(path)})
     return path
 
 

@@ -1,0 +1,34 @@
+# Run with: uv run pre-commit run --all-files
+# Install the git hook with: uv run pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        args: [--fix]
+      - id: ruff-format
+        name: ruff (format)
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: [src/mlb_stats_lab]
+
+      - id: lint-imports
+        name: import-linter
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
+        files: ^src/mlb_stats_lab/.*\.py$
+
+      - id: jupytext-sync
+        name: jupytext --sync notebook templates
+        entry: uv run jupytext --sync
+        language: system
+        files: ^reports/templates/notebooks/.*\.(py|ipynb)$

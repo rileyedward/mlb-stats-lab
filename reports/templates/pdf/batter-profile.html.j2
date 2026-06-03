@@ -1,16 +1,11 @@
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m %}
 
-{% set accent = team | team_color("primary") %}
-
-{% block extra_styles %}
-  .stat-card { border-left-color: {{ accent }}; }
-{% endblock %}
-
 {% block body %}
 
 <section>
   <h2>Season Line</h2>
+  <div class="stat-grid">
   {{ m.stat_card("PA",   line.PA | int) }}
   {{ m.stat_card("AVG",  line.AVG | avg) }}
   {{ m.stat_card("OBP",  line.OBP | avg) }}
@@ -20,10 +15,12 @@
   {{ m.stat_card("BB%",  line["BB%"] | pct) }}
   {{ m.stat_card("K%",   line["K%"] | pct) }}
   {{ m.stat_card("HR",   line.HR | int) }}
+  </div>
 </section>
 
 <section>
   <h2>Plate Discipline + Contact</h2>
+  <div class="stat-grid">
   {{ m.stat_card("Swing%", discipline["Swing%"] | pct) }}
   {{ m.stat_card("Chase%", discipline["Chase%"] | pct) }}
   {{ m.stat_card("Whiff%", discipline["Whiff%"] | pct) }}
@@ -31,6 +28,7 @@
   {{ m.stat_card("Avg EV", contact["Avg EV (mph)"] | mph) }}
   {{ m.stat_card("Barrel%", contact["Barrel%"] | pct) }}
   {{ m.stat_card("HardHit%", contact["HardHit%"] | pct) }}
+  </div>
 </section>
 
 <section>

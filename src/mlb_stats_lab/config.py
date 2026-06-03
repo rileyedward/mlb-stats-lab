@@ -29,6 +29,7 @@ CONFIG_PATH: Path = REPO_ROOT / "statslab.toml"
 @dataclass(frozen=True)
 class Paths:
     notebooks_dir: Path
+    generated_dir: Path
     reports_dir: Path
     templates_dir: Path
     output_dir: Path
@@ -66,6 +67,12 @@ def get_config() -> Config:
     notebooks_dir = _resolve(
         os.environ.get("STATSLAB_NOTEBOOKS_DIR", paths_raw.get("notebooks_dir", "notebooks"))
     )
+    generated_dir = _resolve(
+        os.environ.get(
+            "STATSLAB_GENERATED_DIR",
+            paths_raw.get("generated_dir", str(notebooks_dir / "generated")),
+        )
+    )
     reports_dir = _resolve(paths_raw.get("reports_dir", "reports"))
     templates_dir = _resolve(paths_raw.get("templates_dir", "reports/templates"))
     output_dir = _resolve(
@@ -74,6 +81,7 @@ def get_config() -> Config:
 
     paths = Paths(
         notebooks_dir=notebooks_dir,
+        generated_dir=generated_dir,
         reports_dir=reports_dir,
         templates_dir=templates_dir,
         output_dir=output_dir,

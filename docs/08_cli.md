@@ -1,5 +1,16 @@
 # 08 — CLI
 
+> **Update (ergonomics overhaul).** Changes from the original plan below:
+> - New **`statslab new`** guided command (questionary-backed) is the recommended
+>   entry point: prompts for report type → subject → season → output format → run.
+> - `list-templates` and `flush-cache` are now **flat `@app.command()`s**, not
+>   sub-Typers.
+> - `new-notebook <template>` gained **`--run/--no-run`** (execute via `nbclient`).
+> - Notebook templates are loaded from jupytext `.py` (via `jupytext.read`), not
+>   `.ipynb`; generated notebooks land in `notebooks/generated/`.
+> - `_output.py` adds a `status()` spinner (shown during pybaseball fetch) and a
+>   boxed `summary()` panel printed at the end of each command.
+
 ## Purpose
 
 Defines the `statslab` CLI: command surface, argument shapes, registration mechanism, and how it bridges notebook templates (`06`) and PDF reports (`07`).

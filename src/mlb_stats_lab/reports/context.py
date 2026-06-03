@@ -50,6 +50,8 @@ from mlb_stats_lab.viz import (
     pitch_movement_chart,
     pitch_usage_bar,
     pitch_usage_pie,
+    report_chart_context,
+    report_theme,
     rolling_metric_line,
     splits_bar_chart,
     spray_chart,
@@ -57,6 +59,11 @@ from mlb_stats_lab.viz import (
     zone_grid,
     zone_heatmap,
 )
+
+
+def _accent(team: str | None) -> str:
+    """Primary chart-tint color for a report subject (neutral if unknown)."""
+    return report_theme(team if team and team != "—" else None)["primary"]
 
 
 def _to_record(series: pd.Series) -> dict[str, Any]:
@@ -124,27 +131,30 @@ def build_batter_profile_context(args: dict[str, Any]) -> BatterProfileContext:
 
     team = _detect_team(df, "batter") or "—"
 
-    figs = figs_to_context(
-        spray=spray_chart(
-            df, team_color_abbrev=team if team != "—" else None, title=f"{player} — Batted Balls"
-        ),
-        zone_density=zone_heatmap(df, metric="density", title="Pitches Seen"),
-        zone_swing=zone_heatmap(df, metric="swing_rate", title="Swing Rate"),
-        zone_xwoba=zone_grid(df, metric="xwoba", bins=3, title="xwOBA by Zone"),
-        ev_la=ev_la_scatter(df, title="EV vs LA"),
-        splits_hand=splits_bar_chart(
-            batting_splits(df, axis="vs_hand"), metric="wOBA", title="vs Handedness"
-        ),
-        splits_home_away=splits_bar_chart(
-            batting_splits(df, axis="home_away"), metric="wOBA", title="Home / Away"
-        ),
-        splits_month=splits_bar_chart(
-            batting_splits(df, axis="month"), metric="wOBA", title="By Month"
-        ),
-        rolling_woba=rolling_metric_line(
-            rolling, metric="wOBA", league_average=0.320, title="Rolling wOBA"
-        ),
-    )
+    with report_chart_context(_accent(team)):
+        figs = figs_to_context(
+            spray=spray_chart(
+                df,
+                team_color_abbrev=team if team != "—" else None,
+                title=f"{player} — Batted Balls",
+            ),
+            zone_density=zone_heatmap(df, metric="density", title="Pitches Seen"),
+            zone_swing=zone_heatmap(df, metric="swing_rate", title="Swing Rate"),
+            zone_xwoba=zone_grid(df, metric="xwoba", bins=3, title="xwOBA by Zone"),
+            ev_la=ev_la_scatter(df, title="EV vs LA"),
+            splits_hand=splits_bar_chart(
+                batting_splits(df, axis="vs_hand"), metric="wOBA", title="vs Handedness"
+            ),
+            splits_home_away=splits_bar_chart(
+                batting_splits(df, axis="home_away"), metric="wOBA", title="Home / Away"
+            ),
+            splits_month=splits_bar_chart(
+                batting_splits(df, axis="month"), metric="wOBA", title="By Month"
+            ),
+            rolling_woba=rolling_metric_line(
+                rolling, metric="wOBA", league_average=0.320, title="Rolling wOBA"
+            ),
+        )
 
     takeaways = batter_bullets(line, disc, contact)
 
@@ -208,27 +218,28 @@ def build_pitcher_profile_context(args: dict[str, Any]) -> PitcherProfileContext
 
     team = _detect_team(df, "pitcher") or "—"
 
-    figs = figs_to_context(
-        movement=pitch_movement_chart(df, title=f"{player} — Arsenal Movement"),
-        velocity=velocity_distribution(df, kind="violin", title="Velocity Distribution"),
-        usage_pie=pitch_usage_pie(df, title="Pitch Mix"),
-        usage_hand=pitch_usage_bar(df, by="vs_hand", title="Usage vs Hand"),
-        zone_density=zone_heatmap(
-            df, perspective="pitcher", metric="density", title="Pitch Locations"
-        ),
-        zone_whiff=zone_grid(
-            df, perspective="pitcher", metric="whiff_rate", title="Whiff% by Zone"
-        ),
-        splits_hand=splits_bar_chart(
-            pitching_splits(df, axis="vs_hand"), metric="K-BB%", title="K-BB% vs Hand"
-        ),
-        splits_innings=splits_bar_chart(
-            pitching_splits(df, axis="innings"), metric="K-BB%", title="K-BB% by Innings"
-        ),
-        rolling_k=rolling_metric_line(
-            rolling, metric="K%", league_average=0.225, title="Rolling K%"
-        ),
-    )
+    with report_chart_context(_accent(team)):
+        figs = figs_to_context(
+            movement=pitch_movement_chart(df, title=f"{player} — Arsenal Movement"),
+            velocity=velocity_distribution(df, kind="violin", title="Velocity Distribution"),
+            usage_pie=pitch_usage_pie(df, title="Pitch Mix"),
+            usage_hand=pitch_usage_bar(df, by="vs_hand", title="Usage vs Hand"),
+            zone_density=zone_heatmap(
+                df, perspective="pitcher", metric="density", title="Pitch Locations"
+            ),
+            zone_whiff=zone_grid(
+                df, perspective="pitcher", metric="whiff_rate", title="Whiff% by Zone"
+            ),
+            splits_hand=splits_bar_chart(
+                pitching_splits(df, axis="vs_hand"), metric="K-BB%", title="K-BB% vs Hand"
+            ),
+            splits_innings=splits_bar_chart(
+                pitching_splits(df, axis="innings"), metric="K-BB%", title="K-BB% by Innings"
+            ),
+            rolling_k=rolling_metric_line(
+                rolling, metric="K%", league_average=0.225, title="Rolling K%"
+            ),
+        )
 
     takeaways = pitcher_bullets(line, arsenal, cmd)
 
@@ -294,20 +305,23 @@ def build_team_snapshot_context(args: dict[str, Any]) -> TeamSnapshotContext:
         record["L"] = l
         record["games"] = len(schedule)
 
-    figs = figs_to_context(
-        offense_hand=splits_bar_chart(
-            batting_splits(bat_df, axis="vs_hand"), metric="wOBA", title="Offense vs Hand"
-        ),
-        offense_month=splits_bar_chart(
-            batting_splits(bat_df, axis="month"), metric="wOBA", title="Offense by Month"
-        ),
-        offense_ev_la=ev_la_scatter(
-            bat_df.sample(min(len(bat_df), 1500), random_state=0) if not bat_df.empty else bat_df,
-            title="Team EV / LA",
-        ),
-        staff_usage=pitch_usage_bar(pit_df, title="Staff Usage"),
-        staff_velocity=velocity_distribution(pit_df, kind="box", title="Staff Velocity"),
-    )
+    with report_chart_context(_accent(team)):
+        figs = figs_to_context(
+            offense_hand=splits_bar_chart(
+                batting_splits(bat_df, axis="vs_hand"), metric="wOBA", title="Offense vs Hand"
+            ),
+            offense_month=splits_bar_chart(
+                batting_splits(bat_df, axis="month"), metric="wOBA", title="Offense by Month"
+            ),
+            offense_ev_la=ev_la_scatter(
+                bat_df.sample(min(len(bat_df), 1500), random_state=0)
+                if not bat_df.empty
+                else bat_df,
+                title="Team EV / LA",
+            ),
+            staff_usage=pitch_usage_bar(pit_df, title="Staff Usage"),
+            staff_velocity=velocity_distribution(pit_df, kind="box", title="Staff Velocity"),
+        )
 
     takeaways = team_bullets(off_line, staff_line)
 
@@ -364,18 +378,19 @@ def build_series_matchup_context(args: dict[str, Any]) -> SeriesMatchupContext:
     b_off_line = batting_line(b_bat)
     b_staff_line = pitching_line(b_pit)
 
-    figs = figs_to_context(
-        a_offense_hand=splits_bar_chart(
-            batting_splits(a_bat, axis="vs_hand"), metric="wOBA", title=f"{team_a} vs Hand"
-        ),
-        b_offense_hand=splits_bar_chart(
-            batting_splits(b_bat, axis="vs_hand"), metric="wOBA", title=f"{team_b} vs Hand"
-        ),
-        a_staff_usage=pitch_usage_bar(a_pit, title=f"{team_a} Staff Usage"),
-        b_staff_usage=pitch_usage_bar(b_pit, title=f"{team_b} Staff Usage"),
-        a_velocity=velocity_distribution(a_pit, kind="kde", title=f"{team_a} Velo"),
-        b_velocity=velocity_distribution(b_pit, kind="kde", title=f"{team_b} Velo"),
-    )
+    with report_chart_context(_accent(team_a)):
+        figs = figs_to_context(
+            a_offense_hand=splits_bar_chart(
+                batting_splits(a_bat, axis="vs_hand"), metric="wOBA", title=f"{team_a} vs Hand"
+            ),
+            b_offense_hand=splits_bar_chart(
+                batting_splits(b_bat, axis="vs_hand"), metric="wOBA", title=f"{team_b} vs Hand"
+            ),
+            a_staff_usage=pitch_usage_bar(a_pit, title=f"{team_a} Staff Usage"),
+            b_staff_usage=pitch_usage_bar(b_pit, title=f"{team_b} Staff Usage"),
+            a_velocity=velocity_distribution(a_pit, kind="kde", title=f"{team_a} Velo"),
+            b_velocity=velocity_distribution(b_pit, kind="kde", title=f"{team_b} Velo"),
+        )
 
     take = [
         f"→ {team_a} wOBA {a_off_line.get('wOBA', 0):.3f} vs {team_b} wOBA {b_off_line.get('wOBA', 0):.3f}.",

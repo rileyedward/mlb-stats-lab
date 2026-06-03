@@ -47,6 +47,10 @@ htmlcov/
 reports/output/
 reports/*.ipynb
 notebooks/*.ipynb
+notebooks/generated/
+
+# Paired .ipynb for jupytext .py templates (regenerated on demand)
+reports/templates/notebooks/*.ipynb
 
 # OS
 .DS_Store

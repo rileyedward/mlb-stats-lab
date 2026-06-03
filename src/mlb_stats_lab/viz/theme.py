@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
+
 import matplotlib as mpl
 import seaborn as sns
 
@@ -102,6 +105,56 @@ def team_color(abbrev: str | None, slot: str = "primary") -> str:
         return NEUTRAL_PRIMARY
     info = TEAM_COLORS.get(abbrev.upper())
     return (info or {}).get(slot, NEUTRAL_PRIMARY)
+
+
+def _tint(hex_color: str, amount: float) -> str:
+    """Lighten ``hex_color`` toward white by ``amount`` in [0, 1]."""
+    h = hex_color.lstrip("#")
+    if len(h) != 6:
+        return hex_color
+    r, g, b = (int(h[i : i + 2], 16) for i in (0, 2, 4))
+    r = int(r + (255 - r) * amount)
+    g = int(g + (255 - g) * amount)
+    b = int(b + (255 - b) * amount)
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def report_theme(team: str | None) -> dict[str, str]:
+    """Design tokens for a report, derived from a team (neutral if none).
+
+    Shared by the PDF CSS (via injected custom properties) and the matplotlib
+    chart tinting so a report's color story is defined in exactly one place.
+    """
+    primary = team_color(team, "primary") if team else NEUTRAL_PRIMARY
+    secondary = team_color(team, "secondary") if team else NEUTRAL_ACCENT
+    text = team_color(team, "text_on_primary") if team else "#FFFFFF"
+    return {
+        "primary": primary,
+        "secondary": secondary,
+        "text_on_primary": text,
+        "accent_soft": _tint(primary, 0.88),
+        "accent_mid": _tint(primary, 0.55),
+    }
+
+
+@contextmanager
+def report_chart_context(accent: str | None) -> Iterator[None]:
+    """Temporarily tint chart titles/spines with ``accent`` (report figures).
+
+    Leaves data series colors untouched — only the framing picks up the team
+    color, so interactive/notebook charts keep the neutral defaults.
+    """
+    if not accent:
+        yield
+        return
+    with mpl.rc_context(
+        {
+            "axes.titlecolor": accent,
+            "axes.edgecolor": accent,
+            "axes.labelcolor": "#333333",
+        }
+    ):
+        yield
 
 
 def pitch_color(code: str | None) -> str:

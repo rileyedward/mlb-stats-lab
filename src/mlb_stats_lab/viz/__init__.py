@@ -6,6 +6,12 @@ Applies the project theme on import.
 from __future__ import annotations
 
 from mlb_stats_lab.viz.arsenal import pitch_movement_chart, velocity_distribution
+from mlb_stats_lab.viz.display import (
+    metric_row,
+    report_header,
+    section,
+    stat_table,
+)
 from mlb_stats_lab.viz.distributions import (
     ev_distribution,
     la_distribution,
@@ -24,6 +30,8 @@ from mlb_stats_lab.viz.theme import (
     apply,
     outcome_color,
     pitch_color,
+    report_chart_context,
+    report_theme,
     team_color,
 )
 from mlb_stats_lab.viz.usage import pitch_usage_bar, pitch_usage_pie
@@ -41,15 +49,21 @@ __all__ = [
     "fig_to_png",
     "fig_to_svg",
     "la_distribution",
+    "metric_row",
     "outcome_color",
     "pitch_color",
     "pitch_location_scatter",
     "pitch_movement_chart",
     "pitch_usage_bar",
     "pitch_usage_pie",
+    "report_chart_context",
+    "report_header",
+    "report_theme",
     "rolling_metric_line",
+    "section",
     "splits_bar_chart",
     "spray_chart",
+    "stat_table",
     "team_color",
     "velocity_box",
     "velocity_distribution",
