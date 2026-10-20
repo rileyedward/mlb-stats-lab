@@ -2,7 +2,7 @@
 
 MLB Statcast analytics playground with notebooks and team-themed PDF reports.
 
-> **Status:** Active — in development.
+> **Status:** Complete — no further development planned, but ready to download and use.
 
 ## Overview
 
@@ -149,7 +149,7 @@ uv run pytest -m "not network"
 
 ## Contributing
 
-Bug reports, ideas and pull requests are welcome through [Issues](../../issues). This is a personal project I work on in my spare time, so replies can be slow and not every suggestion will make it in. For anything bigger than a small fix, open an issue first so we can talk it through.
+No new features are planned, but it's meant to be used: bug reports through [Issues](../../issues) are welcome, and small fixes may be merged when I get to them. For anything bigger, you're welcome to fork it and take it in your own direction under the license below.
 
 ## License
 
